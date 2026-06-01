@@ -232,23 +232,13 @@
     background: var(--bg2);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 0;
+    padding: 18px 14px;
     cursor: pointer;
     transition: all 0.15s;
     text-align: left;
     position: relative;
     overflow: hidden;
     user-select: none;
-    height: 72px;
-    background-size: cover;
-    background-position: center top;
-  }
-  .spell-btn::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 12px;
-    pointer-events: none;
   }
   .spell-btn:active { transform: scale(0.96); }
   .spell-btn .sp-name {
@@ -256,28 +246,23 @@
     font-size: 11px;
     letter-spacing: 0.05em;
     display: block;
-    position: absolute;
-    bottom: 10px;
-    left: 12px; right: 12px;
-    z-index: 1;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.9);
   }
 
-  .spell-btn.inst::after { background: rgba(10,30,20,0.62); }
+  .spell-btn.inst { border-color: rgba(62,207,142,0.3); }
   .spell-btn.inst .sp-name { color: var(--teal); }
-  .spell-btn.inst:active::after { background: rgba(10,30,20,0.4); }
+  .spell-btn.inst:active { background: rgba(62,207,142,0.08); }
 
-  .spell-btn.copy::after { background: rgba(20,10,30,0.62); }
+  .spell-btn.copy { border-color: rgba(201,122,240,0.3); }
   .spell-btn.copy .sp-name { color: #c97af0; }
-  .spell-btn.copy:active::after { background: rgba(20,10,30,0.4); }
+  .spell-btn.copy:active { background: rgba(201,122,240,0.08); }
 
-  .spell-btn.other::after { background: rgba(30,20,5,0.62); }
+  .spell-btn.other { border-color: rgba(240,160,48,0.3); }
   .spell-btn.other .sp-name { color: var(--amber); }
-  .spell-btn.other:active::after { background: rgba(30,20,5,0.4); }
+  .spell-btn.other:active { background: rgba(240,160,48,0.08); }
 
-  .spell-btn.creature::after { background: rgba(10,12,18,0.62); }
+  .spell-btn.creature { border-color: rgba(160,140,100,0.2); }
   .spell-btn.creature .sp-name { color: var(--text2); }
-  .spell-btn.creature:active::after { background: rgba(10,12,18,0.4); }
+  .spell-btn.creature:active { background: rgba(160,140,100,0.06); }
 
 
 
@@ -351,7 +336,6 @@
         <div class="stat-content">
           <div class="stat-label">With Prowess</div>
           <div class="stat-value" id="val-prowess">+0/+0</div>
-          <div class="stat-breakdown" id="bd-prowess"></div>
         </div>
       </div>
       <div class="stat nonprowess-stat" id="card-noprowess">
@@ -359,7 +343,6 @@
         <div class="stat-content">
           <div class="stat-label">No Prowess</div>
           <div class="stat-value" id="val-noprowess">+0/+0</div>
-          <div class="stat-breakdown" id="bd-noprowess"></div>
         </div>
       </div>
       <div class="stat storm-stat" style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;">
@@ -377,16 +360,16 @@
   <div class="section" style="padding-top:14px;">
     <div class="section-label">Cast a spell</div>
     <div class="spells">
-      <button class="spell-btn inst" onclick="cast('inst')" style="background-image:url('img/balmor-battlemage-captain.jpg')">
+      <button class="spell-btn inst" onclick="cast('inst')">
         <span class="sp-name">Instant / Sorcery</span>
       </button>
-      <button class="spell-btn copy" onclick="cast('copy')" style="background-image:url('img/veyran-voice-of-duality.jpg')">
+      <button class="spell-btn copy" onclick="cast('copy')">
         <span class="sp-name">Copy</span>
       </button>
-      <button class="spell-btn other" onclick="cast('other')" style="background-image:url('img/leonin-lightscribe.jpg')">
+      <button class="spell-btn other" onclick="cast('other')">
         <span class="sp-name">Other Noncreature</span>
       </button>
-      <button class="spell-btn creature" onclick="cast('creature')" style="background-image:url('img/monk.jpg')">
+      <button class="spell-btn creature" onclick="cast('creature')">
         <span class="sp-name">Creature Spell</span>
       </button>
     </div>
@@ -462,18 +445,6 @@ function render() {
   document.getElementById('val-prowess').textContent = fmt(prowP, prowT);
   document.getElementById('val-noprowess').textContent = fmt(noP, noT);
   document.getElementById('val-storm').textContent = S.storm;
-
-  let bd1 = [];
-  if (S.prowess_p) bd1.push('prowess +' + S.prowess_p + '/+' + S.prowess_t);
-  if (S.leonin_p)  bd1.push('Leonin +' + S.leonin_p + '/+' + S.leonin_t);
-  if (S.balmor_p)  bd1.push('Balmor +' + S.balmor_p + '/+0');
-  document.getElementById('bd-prowess').textContent = bd1.join(' · ');
-
-  let bd2 = [];
-  if (S.leonin_p) bd2.push('Leonin +' + S.leonin_p + '/+' + S.leonin_t);
-  if (S.balmor_p) bd2.push('Balmor +' + S.balmor_p + '/+0');
-  document.getElementById('bd-noprowess').textContent = bd2.length ? bd2.join(' · ') : '—';
-
 }
 
 function resetAll() {
