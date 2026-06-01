@@ -179,9 +179,9 @@
 
   .stat-value {
     font-family: 'Cinzel', serif;
-    font-size: 46px;
+    font-size: 36px;
     font-weight: 700;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.02em;
     line-height: 1;
     padding-left: 10px;
   }
@@ -431,9 +431,20 @@ function render() {
   const prowT = S.prowess_t + S.leonin_t;
   const noP   = S.leonin_p  + S.balmor_p;
   const noT   = S.leonin_t;
-  document.getElementById('val-prowess').textContent   = fmt(prowP, prowT);
-  document.getElementById('val-noprowess').textContent = fmt(noP, noT);
+  const ps = fmt(prowP, prowT);
+  const ns = fmt(noP, noT);
+  document.getElementById('val-prowess').textContent   = ps;
+  document.getElementById('val-noprowess').textContent = ns;
   document.getElementById('val-storm').textContent     = S.storm;
+  scaleBuff('val-prowess', ps);
+  scaleBuff('val-noprowess', ns);
+}
+
+function scaleBuff(id, str) {
+  const el = document.getElementById(id);
+  const len = str.length;
+  const size = len <= 7 ? 36 : len <= 9 ? 28 : len <= 11 ? 22 : 18;
+  el.style.fontSize = size + 'px';
 }
 
 function resetAll() {
