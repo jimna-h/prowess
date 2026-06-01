@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Prowess Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --bg2: #13161e;
+    --bg3: #1a1e2a;
+    --border: rgba(160,140,100,0.18);
+    --border2: rgba(160,140,100,0.35);
+    --gold: #c9a84c;
+    --gold2: #e8c97a;
+    --gold-dim: rgba(201,168,76,0.12);
+    --text: #e8e0d0;
+    --text2: #a09880;
+    --text3: #5a5448;
+    --blue: #4a9eff;
+    --blue-bg: rgba(74,158,255,0.1);
+    --teal: #3ecf8e;
+    --teal-bg: rgba(62,207,142,0.1);
+    --amber: #f0a030;
+    --amber-bg: rgba(240,160,48,0.1);
+    --red: #e05050;
+    --red-bg: rgba(224,80,80,0.1);
+    --prowess: #3ecf8e;
+    --prowess-bg: rgba(62,207,142,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    min-height: 100vh;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  /* Subtle arcane grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 430px;
+    margin: 0 auto;
+    padding: 0 0 40px 0;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 28px 20px 20px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: var(--gold);
+  }
+  .header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 17px;
+    letter-spacing: 0.15em;
+    color: var(--gold2);
+    text-transform: uppercase;
+  }
+  .header .subtitle {
+    font-size: 13px;
+    color: var(--text3);
+    margin-top: 4px;
+    font-style: italic;
+    letter-spacing: 0.02em;
+  }
+
+  /* Section */
+  .section { padding: 16px 16px 0; }
+  .section-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+
+  /* Toggle buttons */
+  .toggles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .tog {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 8px 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    user-select: none;
+  }
+  .tog::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+    border-radius: 10px;
+  }
+  .tog:active { transform: scale(0.96); }
+  .tog-img {
+    width: 100%;
+    height: 70px;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: 6px;
+    display: block;
+    margin-bottom: 6px;
+    opacity: 0.45;
+    transition: opacity 0.2s;
+  }
+  .tog.on .tog-img { opacity: 1; }
+  .tog-name {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--text2);
+    display: block;
+    transition: color 0.2s;
+  }
+  .tog-sub {
+    font-size: 10px;
+    color: var(--text3);
+    display: block;
+    margin-top: 3px;
+    line-height: 1.3;
+    font-style: italic;
+    transition: color 0.2s;
+  }
+  .tog.on { border-color: var(--gold); background: var(--gold-dim); }
+  .tog.on::before { background: radial-gradient(ellipse at top, rgba(201,168,76,0.08), transparent 70%); opacity: 1; }
+  .tog.on .tog-name { color: var(--gold2); }
+  .tog.on .tog-sub { color: var(--gold); }
+
+  /* Stat display */
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 12px 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    border-radius: 10px 10px 0 0;
+  }
+  .stat.prowess-stat::before { background: var(--prowess); }
+  .stat.nonprowess-stat::before { background: var(--blue); }
+  .stat.veyran-stat::before { background: #c97af0; }
+  .stat.storm-stat::before { background: var(--amber); }
+
+  .stat-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .stat-value {
+    font-family: 'Cinzel', serif;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    transition: transform 0.15s, color 0.15s;
+  }
+  .stat.prowess-stat .stat-value { color: var(--prowess); }
+  .stat.nonprowess-stat .stat-value { color: var(--blue); }
+  .stat.veyran-stat .stat-value { color: #c97af0; }
+  .stat.storm-stat .stat-value { color: var(--amber); font-size: 28px; }
+  .stat-note {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 5px;
+    font-style: italic;
+    line-height: 1.4;
+  }
+  .stat-breakdown {
+    font-size: 10px;
+    color: var(--text2);
+    margin-top: 4px;
+    line-height: 1.5;
+    min-height: 14px;
+  }
+
+  .stat.pop .stat-value {
+    animation: popval 0.3s cubic-bezier(0.2,0.8,0.4,1);
+  }
+  @keyframes popval {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.18); }
+    100% { transform: scale(1); }
+  }
+
+  /* Spell buttons */
+  .spells { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .spell-btn {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+  }
+  .spell-btn:active { transform: scale(0.96); }
+  .spell-btn .sp-img {
+    width: 100%;
+    height: 60px;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: 6px;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .spell-btn .sp-name {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .spell-btn .sp-sub {
+    font-size: 10px;
+    color: var(--text3);
+    display: block;
+    line-height: 1.4;
+    font-style: italic;
+  }
+
+  .spell-btn.inst { border-color: rgba(62,207,142,0.3); }
+  .spell-btn.inst .sp-name { color: var(--teal); }
+  .spell-btn.inst:active { background: var(--teal-bg); }
+
+  .spell-btn.copy { border-color: rgba(201,122,240,0.3); }
+  .spell-btn.copy .sp-name { color: #c97af0; }
+  .spell-btn.copy:active { background: rgba(201,122,240,0.08); }
+
+  .spell-btn.other { border-color: rgba(240,160,48,0.3); }
+  .spell-btn.other .sp-name { color: var(--amber); }
+  .spell-btn.other:active { background: var(--amber-bg); }
+
+  .spell-btn.creature { border-color: rgba(160,140,100,0.2); }
+  .spell-btn.creature .sp-name { color: var(--text2); }
+  .spell-btn.creature:active { background: rgba(160,140,100,0.06); }
+
+
+
+  /* Reset */
+  .reset-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text3);
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .reset-btn:active { border-color: var(--red); color: var(--red); background: var(--red-bg); transform: scale(0.98); }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 16px 0;
+  }
+
+  /* Veyran glow when active */
+  .veyran-active-note {
+    background: rgba(201,122,240,0.08);
+    border: 1px solid rgba(201,122,240,0.25);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 11px;
+    color: #c97af0;
+    font-style: italic;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>Prowess Tracker</h1>
+    <div class="subtitle">spell trigger calculator</div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Creatures in play</div>
+    <div class="toggles">
+      <button class="tog" id="tog-balmor" onclick="toggle('balmor')">
+        <img class="tog-img" src="img/balmor-battlemage-captain.jpg" alt="Balmor">
+        <span class="tog-name">Balmor</span>
+      </button>
+      <button class="tog" id="tog-leonin" onclick="toggle('leonin')">
+        <img class="tog-img" src="img/leonin-lightscribe.jpg" alt="Leonin">
+        <span class="tog-name">Leonin</span>
+      </button>
+      <button class="tog" id="tog-veyran" onclick="toggle('veyran')">
+        <img class="tog-img" src="img/veyran-voice-of-duality.jpg" alt="Veyran">
+        <span class="tog-name">Veyran</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section" style="padding-top:14px;">
+    <div class="section-label">Current buffs this turn</div>
+    <div class="stats">
+      <div class="stat prowess-stat" id="card-prowess">
+        <div class="stat-label">With Prowess</div>
+        <div class="stat-value" id="val-prowess">+0/+0</div>
+        <div class="stat-breakdown" id="bd-prowess"></div>
+      </div>
+      <div class="stat nonprowess-stat" id="card-noprowess">
+        <div class="stat-label">No Prowess</div>
+        <div class="stat-value" id="val-noprowess">+0/+0</div>
+        <div class="stat-breakdown" id="bd-noprowess"></div>
+      </div>
+      <div class="stat storm-stat" style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;">
+        <div class="stat-label">Storm Count</div>
+        <div class="stat-value" id="val-storm" style="font-size:36px;">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section" style="padding-top:14px;">
+    <div class="section-label">Cast a spell</div>
+    <div class="spells">
+      <button class="spell-btn inst" onclick="cast('inst')">
+        <span class="sp-name">Instant / Sorcery</span>
+      </button>
+      <button class="spell-btn copy" onclick="cast('copy')">
+        <span class="sp-name">Copy</span>
+      </button>
+      <button class="spell-btn other" onclick="cast('other')">
+        <span class="sp-name">Other Noncreature</span>
+      </button>
+      <button class="spell-btn creature" onclick="cast('creature')">
+        <img class="sp-img" src="img/monk.jpg" alt="">
+        <span class="sp-name">Creature Spell</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section" style="padding-top:14px;">
+    <button class="reset-btn" onclick="resetAll()">⟳ &nbsp; Reset Turn</button>
+  </div>
+</div>
+
+<script>
+// Toggles only affect FUTURE casts — past accumulated buffs are always shown in full.
+// Each card tracks its own accumulated total independently.
+const S = {
+  balmor: false, leonin: false, veyran: false,
+  // accumulated buffs — never reduced by toggling
+  prowess_p: 0, prowess_t: 0,  // from prowess ability itself
+  leonin_p: 0, leonin_t: 0,
+  balmor_p: 0,
+  storm: 0
+};
+
+function toggle(who) {
+  S[who] = !S[who];
+  document.getElementById('tog-' + who).classList.toggle('on', S[who]);
+  render();
+}
+
+function cast(type) {
+  S.storm++;
+  const mult = S.veyran ? 2 : 1; // Veyran doubles all triggered abilities on inst/sorcery and copy
+
+  if (type === 'inst') {
+    // Prowess: triggered ability on each prowess creature — Veyran doubles it
+    S.prowess_p += mult; S.prowess_t += mult;
+    if (S.leonin) { S.leonin_p += mult; S.leonin_t += mult; }
+    if (S.balmor) { S.balmor_p += mult; }
+  } else if (type === 'copy') {
+    // Copy: Leonin triggers (cast or copy). Balmor says "cast" only — not copy.
+    if (S.leonin) { S.leonin_p += mult; S.leonin_t += mult; }
+  } else if (type === 'other') {
+    // Other noncreature: prowess only, no companion triggers, Veyran doesn't apply
+    S.prowess_p += 1; S.prowess_t += 1;
+  }
+  // creature: storm only
+
+  render();
+  popCard('card-prowess');
+  popCard('card-noprowess');
+}
+
+function popCard(id) {
+  const el = document.getElementById(id);
+  const v = el.querySelector('.stat-value');
+  v.classList.remove('pop');
+  void v.offsetWidth;
+  v.classList.add('pop');
+}
+
+function fmt(p, t) {
+  return (p >= 0 ? '+' : '') + p + '/' + (t >= 0 ? '+' : '') + t;
+}
+
+function render() {
+  // Always show full accumulated totals — toggle state doesn't hide past buffs
+  const prowP = S.prowess_p + S.leonin_p + S.balmor_p;
+  const prowT = S.prowess_t + S.leonin_t;
+  const noP   = S.leonin_p + S.balmor_p;
+  const noT   = S.leonin_t;
+
+  document.getElementById('val-prowess').textContent = fmt(prowP, prowT);
+  document.getElementById('val-noprowess').textContent = fmt(noP, noT);
+  document.getElementById('val-storm').textContent = S.storm;
+
+  let bd1 = [];
+  if (S.prowess_p) bd1.push('prowess +' + S.prowess_p + '/+' + S.prowess_t);
+  if (S.leonin_p)  bd1.push('Leonin +' + S.leonin_p + '/+' + S.leonin_t);
+  if (S.balmor_p)  bd1.push('Balmor +' + S.balmor_p + '/+0');
+  document.getElementById('bd-prowess').textContent = bd1.join(' · ');
+
+  let bd2 = [];
+  if (S.leonin_p) bd2.push('Leonin +' + S.leonin_p + '/+' + S.leonin_t);
+  if (S.balmor_p) bd2.push('Balmor +' + S.balmor_p + '/+0');
+  document.getElementById('bd-noprowess').textContent = bd2.length ? bd2.join(' · ') : '—';
+
+}
+
+function resetAll() {
+  Object.assign(S, { prowess_p:0, prowess_t:0, leonin_p:0, leonin_t:0, balmor_p:0, storm:0 });
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
